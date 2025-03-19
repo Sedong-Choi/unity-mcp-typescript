@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    /* 기본 옵션 */
+    "target": "ES2020",               // Node.js 14 이상을 타겟으로 설정
+    "module": "commonjs",             // Node.js와 호환되는 모듈 시스템
+    "lib": ["ES2020"],                // 사용할 라이브러리 (DOM은 서버에서 불필요)
+    "outDir": "./dist",               // 컴파일된 JS 파일 출력 위치
+    "rootDir": "./src",               // TypeScript 소스 파일 위치
+
+    /* 타입 체크 옵션 */
+    "strict": true,                   // 모든 엄격한 타입-체킹 옵션 활성화
+    "esModuleInterop": true,          // CommonJS 모듈 import 지원
+    "skipLibCheck": true,             // 라이브러리 타입 체크 건너뛰기 (빌드 속도 향상)
+    "forceConsistentCasingInFileNames": true,  // 파일명 대소문자 일관성 강제
+
+    /* 고급 옵션 */
+    "resolveJsonModule": true,        // JSON 파일을 모듈로 import 허용
+    "sourceMap": true,                // 디버깅을 위한 소스맵 생성
+    "declaration": true,              // d.ts 타입 선언 파일 생성
+    "removeComments": false,          // 주석 유지 (중요 문서화)
+    "noImplicitAny": true,            // 암시적 any 타입 금지
+    "moduleResolution": "node",       // 모듈 해결 전략
+
+    /* 추가 옵션 */
+    "allowSyntheticDefaultImports": true,  // default export 없는 모듈의 import 허용
+    "baseUrl": ".",                   // 모듈 해결 기준 경로
+    "paths": {                        // 경로 별칭 설정 (선택적)
+      "@/*": ["src/*"]
+    }
+  },
+  "include": ["src/**/*"],            // 컴파일할 파일 포함 패턴
+  "exclude": ["node_modules", "**/*.test.ts"]  // 컴파일 제외 패턴
+}
