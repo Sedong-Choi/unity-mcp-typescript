@@ -8,7 +8,9 @@
     "dev": "ts-node src/server.ts",
     "build": "tsc",
     "lint": "eslint . --ext .ts",
-    "test": "jest"
+    "test": "jest",
+    "test:ollama":"ts-node ./test-ollama-connection.ts",
+    "test:websocket":"ts-node ./test-websocket-client.ts"
   },
   "keywords": [
     "mcp",
