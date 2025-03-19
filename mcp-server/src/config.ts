@@ -13,7 +13,7 @@ const config: Config = {
   
   // Ollama 설정
   OLLAMA_HOST: process.env.OLLAMA_HOST || 'http://localhost:11434',
-  OLLAMA_MODEL: process.env.OLLAMA_MODEL || 'gemma:12b',
+  OLLAMA_MODEL: process.env.OLLAMA_MODEL || 'gemma3:12b',
   
   // 레이트 리밋 설정
   RATE_LIMIT_WINDOW: parseInt(process.env.RATE_LIMIT_WINDOW || '60000', 10), // 1분

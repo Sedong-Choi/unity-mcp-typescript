@@ -13,7 +13,7 @@ ws.on('open', () => {
     conversationId: uuidv4(),
     message: '안녕하세요, MCP 서버!',
     options: {
-      model: 'gemma:12b'
+      model: 'gemma3:12b'
     }
   };
   
