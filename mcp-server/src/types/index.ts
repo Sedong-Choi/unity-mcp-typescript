@@ -4,14 +4,14 @@ import { EventEmitter } from 'events';
 
 // 클라이언트 메시지 인터페이스
 export interface ClientMessage {
-  command: string;
-  sessionId?: string;
-  conversationId?: string;
+  command: string;       // 'generate', 'chat', 'reset' 등
+  conversationId?: string; // 대화 ID (선택적)
+  message: string;       // 사용자 메시지
   options?: {
-    stream?: boolean;
-    temperature?: number;
-    maxTokens?: number;
-    [key: string]: any;
+    stream?: boolean;    // 스트리밍 활성화 여부
+    temperature?: number; // 생성 온도
+    maxTokens?: number;  // 최대 토큰 수
+    model?: string;      // 사용할 모델 (선택적)
   };
 }
 
@@ -28,6 +28,7 @@ export interface ServerResponse {
 export interface OllamaRequest {
   model: string;
   prompt: string;
+  system: string,
   stream?: boolean;
   options?: {
     temperature?: number;
@@ -131,4 +132,23 @@ export interface IWebSocketHandler {
   handleMessage(sessionId: string, data: WebSocket.Data): Promise<void>;
   handleDisconnect(sessionId: string): void;
   getSessions(): Map<string, ClientSession>;
+}
+// Unity 코드 수정 관련 타입
+export interface CodeModification {
+  filePath: string;    // 수정할 파일 경로
+  content: string;     // 새로운 파일 내용 또는 변경할 내용
+  operation: 'create' | 'modify' | 'delete';  // 수행할 작업
+  targetSection?: string;  // 수정할 경우 대상 섹션 (선택적)
+}
+
+export interface UnityCodeManager {
+  readFile(relativePath: string): string;
+  writeFile(relativePath: string, content: string): void;
+  listFiles(relativePath?: string): string[];
+  getProjectPath(): string;
+}
+
+export interface CodeModificationParser {
+  parseAIResponse(text: string): CodeModification[];
+  modifySection(originalContent: string, sectionName: string, newContent: string): string;
 }

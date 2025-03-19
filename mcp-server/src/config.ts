@@ -31,3 +31,9 @@ const config: Config = {
 };
 
 export default config;
+
+export const unityConfig = {
+  projectPath: process.env.UNITY_PROJECT_PATH || './unity-project',
+  assetsPath: 'Assets/Scripts',
+  defaultScriptExtension: '.cs'
+};

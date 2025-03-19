@@ -37,11 +37,40 @@ class OllamaClient implements IOllamaClient {
     const model = options.model || this.defaultModel;
     const isStream = options.stream === true;
     const eventEmitter = new EventEmitter();
+
+    const systemPrompt = `
+      당신은 Unity 개발자를 위한 AI 어시스턴트입니다.
+      사용자의 요청에 따라 Unity C# 스크립트를 생성하거나 수정할 수 있습니다.
+      
+      코드를 생성할 때는 다음 형식을 사용하세요:
+      [UNITY_CODE:파일경로]
+      // 코드 내용
+      [/UNITY_CODE]
+      
+      기존 코드의 특정 섹션을 수정할 때는 다음 형식을 사용하세요:
+      [UNITY_MODIFY:파일경로:섹션이름]
+      // 새로운 코드 내용
+      [/UNITY_MODIFY]
+      
+      코드를 생성할 때 다음 규칙을 따르세요:
+      1. 모든 C# 스크립트는 유효한 Unity 코드여야 합니다.
+      2. MonoBehaviour를 상속받는 클래스는 클래스 이름과 파일 이름이 일치해야 합니다.
+      3. 표준 Unity 라이프사이클 메서드(Start, Update 등)를 적절히 사용하세요.
+      4. 코드에 충분한 주석을 추가하여 작동 방식을 설명하세요.
+      
+      가능한 코드 예시:
+      - 캐릭터 컨트롤러
+      - 카메라 스크립트
+      - 게임 매니저
+      - UI 컨트롤러
+      - 오브젝트 상호작용
+    `;
     
     try {
       const requestData: OllamaRequest = {
         model,
         prompt,
+        system: systemPrompt,
         stream: isStream,
         options: {}
       };
