@@ -1,6 +1,6 @@
 // src/server.ts
 import * as http from 'http';
-import * as express from 'express';
+import express from 'express';
 import WebSocket from 'ws';
 
 // 설정 및 로거 가져오기
