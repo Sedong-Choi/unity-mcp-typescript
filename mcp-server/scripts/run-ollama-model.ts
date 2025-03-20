@@ -12,7 +12,7 @@ const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'gemma3:12b';
 const OLLAMA_HOST = process.env.OLLAMA_HOST || 'http://localhost:11434';
 
 // Ollama API 응답 타입 정의
-interface OllamaTagsResponse {
+export interface OllamaTagsResponse {
   models: Array<{
     name: string;
     model: string;

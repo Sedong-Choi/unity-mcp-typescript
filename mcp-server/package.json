@@ -11,7 +11,8 @@
     "test:websocket": "ts-node ./test-websocket-client.ts",
     "build": "tsc",
     "lint": "eslint . --ext .ts",
-    "test": "jest"
+    "test": "jest",
+    "check:ollama": "ts-node ./scripts/check-ollama-server.ts"
   },
   "keywords": [
     "mcp",
