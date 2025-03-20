@@ -4,7 +4,9 @@
   "description": "Model Context Protocol Server with Ollama Integration",
   "main": "dist/server.js",
   "scripts": {
-    "start": "concurrently \"pnpm start:ollama-all\" \"node dist/server.js\"",
+    "start": "pnpm build && node dist/server.js",
+    "start:ollama-all": "pnpm serve:ollama & sleep 3 && pnpm run:ollama",
+    "start:interactive": "ts-node ./scripts/run-ollama-model.ts",
     "dev": "ts-node src/server.ts",
     "build": "tsc",
     "lint": "eslint . --ext .ts",
@@ -12,8 +14,7 @@
     "test:ollama": "ts-node ./test-ollama-connection.ts",
     "test:websocket": "ts-node ./test-websocket-client.ts",
     "serve:ollama": "ollama serve",
-    "run:ollama": "ts-node ./scripts/run-ollama-model.ts",
-    "start:ollama-all": "pnpm serve:ollama & sleep 3 && pnpm run:ollama"
+    "run:ollama": "ts-node ./scripts/run-ollama-model.ts"
   },
   "keywords": [
     "mcp",

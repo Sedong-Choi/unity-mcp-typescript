@@ -11,6 +11,32 @@ dotenv.config();
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'gemma3:12b';
 const OLLAMA_HOST = process.env.OLLAMA_HOST || 'http://localhost:11434';
 
+// Ollama API 응답 타입 정의
+interface OllamaTagsResponse {
+  models: Array<{
+    name: string;
+    model: string;
+    modified_at: string;
+    size: number;
+    digest: string;
+    details?: any;
+  }>;
+}
+
+interface OllamaGenerateResponse {
+  model: string;
+  created_at: string;
+  response: string;
+  done: boolean;
+  context?: number[];
+  total_duration?: number;
+  load_duration?: number;
+  prompt_eval_count?: number;
+  prompt_eval_duration?: number;
+  eval_count?: number;
+  eval_duration?: number;
+}
+
 // Ollama 서버 상태 확인 함수
 async function checkOllamaServer(): Promise<boolean> {
   try {
@@ -69,9 +95,9 @@ async function runOllamaModel() {
   // 모델 가용성 확인
   try {
     const response = await fetch(`${OLLAMA_HOST}/api/tags`);
-    const data = await response.json();
+    const data = await response.json() as OllamaTagsResponse;
     const models = data.models || [];
-    const modelExists = models.some((model: any) => model.name === OLLAMA_MODEL);
+    const modelExists = models.some((model) => model.name === OLLAMA_MODEL);
     
     if (!modelExists) {
       console.log(`Model ${OLLAMA_MODEL} is not available. Pulling the model...`);
@@ -81,7 +107,7 @@ async function runOllamaModel() {
         stdio: 'inherit'
       });
       
-      await new Promise((resolve, reject) => {
+      await new Promise<number>((resolve, reject) => {
         pullProcess.on('close', (code) => {
           if (code === 0) {
             console.log(`Successfully pulled model ${OLLAMA_MODEL}`);
@@ -135,7 +161,7 @@ async function runOllamaModel() {
           })
         });
         
-        const data = await response.json();
+        const data = await response.json() as OllamaGenerateResponse;
         
         if (data.response) {
           console.log(`\n${data.response}\n`);
