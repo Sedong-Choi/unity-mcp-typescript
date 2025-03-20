@@ -1,0 +1,20 @@
+{
+  "name": "com.mcp.client",
+  "version": "1.0.0",
+  "displayName": "MCP Client",
+  "description": "Model Context Protocol 클라이언트 - Unity에서 AI 코드 생성 및 수정을 위한 도구",
+  "unity": "2020.3",
+  "dependencies": {
+    "com.unity.nuget.newtonsoft-json": "3.0.2"
+  },
+  "keywords": [
+    "ai",
+    "code generation",
+    "editor tool"
+  ],
+  "author": {
+    "name": "Sedong Choi",
+    "email": "bulssajo00@gmail.com",
+    "url": "https://github.com/Sedong-Choi"
+  }
+}

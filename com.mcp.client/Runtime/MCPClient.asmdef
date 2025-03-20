@@ -1,0 +1,19 @@
+{
+  "name": "MCP.Client",
+  "rootNamespace": "MCP",
+  "references": [
+    "Unity.Newtonsoft.Json"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": true,
+  "precompiledReferences": [
+    "Newtonsoft.Json.dll",
+    "websocket-sharp.dll"
+  ],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
