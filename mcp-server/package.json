@@ -4,17 +4,14 @@
   "description": "Model Context Protocol Server with Ollama Integration",
   "main": "dist/server.js",
   "scripts": {
-    "start": "pnpm build && node dist/server.js",
-    "start:ollama-all": "pnpm serve:ollama & sleep 3 && pnpm run:ollama",
-    "start:interactive": "ts-node ./scripts/run-ollama-model.ts",
-    "dev": "ts-node src/server.ts",
+    "start:dev": "NODE_ENV=development pnpm build && pnpm start:ollama & sleep 3 && node dist/server.js",
+    "start:prod": "NODE_ENV=production pnpm build && node dist/server.js",
+    "start:ollama": "ollama serve",
+    "test:connection": "ts-node ./test-ollama-connection.ts",
+    "test:websocket": "ts-node ./test-websocket-client.ts",
     "build": "tsc",
     "lint": "eslint . --ext .ts",
-    "test": "jest",
-    "test:ollama": "ts-node ./test-ollama-connection.ts",
-    "test:websocket": "ts-node ./test-websocket-client.ts",
-    "serve:ollama": "ollama serve",
-    "run:ollama": "ts-node ./scripts/run-ollama-model.ts"
+    "test": "jest"
   },
   "keywords": [
     "mcp",
