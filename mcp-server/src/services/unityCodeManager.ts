@@ -7,12 +7,20 @@ class FileManager implements UnityCodeManager {
   private unityProjectPath: string;
   
   constructor(unityProjectPath: string) {
-    this.unityProjectPath = unityProjectPath;
-    logger.info(`Unity 프로젝트 경로 설정: ${unityProjectPath}`);
+    // 경로에서 이스케이프 문자 제거
+    this.unityProjectPath = unityProjectPath.replace(/\\/g, '');;
+    logger.info(`Unity 프로젝트 경로 설정: ${this.unityProjectPath}`);
     
     // 경로 유효성 검사
-    if (!fs.existsSync(unityProjectPath)) {
-      logger.warn(`Unity 프로젝트 경로를 찾을 수 없습니다: ${unityProjectPath}`);
+    try {
+      if (!fs.existsSync(this.unityProjectPath)) {
+        logger.warn(`Unity 프로젝트 경로를 찾을 수 없습니다: ${this.unityProjectPath}`);
+        logger.info(`현재 작업 디렉토리: ${process.cwd()}`);
+      } else {
+        logger.info(`Unity 프로젝트 경로 확인 완료: ${this.unityProjectPath}`);
+      }
+    } catch (error) {
+      logger.error(`경로 확인 중 오류 발생: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
   
