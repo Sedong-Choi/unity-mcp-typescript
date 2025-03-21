@@ -19,42 +19,44 @@ namespace MCP.Core
     {
         // Singleton instance
         private static MCPConnection _instance;
-        
+
         // WebSocket connection
 #if UNITY_WEBGL && !UNITY_EDITOR
         private int _webSocketInstance = -1;
 #else
         private WebSocket _webSocket;
 #endif
-        
+
         // Connection status
         private bool _isConnected = false;
         private bool _isConnecting = false;
-        private bool _autoReconnect = true;
-        
+
+
         // Server information
+        // 서버 정보
         [SerializeField] private string _serverUrl = "ws://localhost:8765";
         [SerializeField] private string _apiKey = "";
-        
+
         // Reconnection settings
+        [SerializeField] private bool _autoReconnect = true;
         [SerializeField] private int _reconnectDelay = 5;
         [SerializeField] private int _maxReconnectAttempts = 5;
         private int _reconnectAttempts = 0;
-        
+
         // Connection events
         public delegate void ConnectionEventHandler();
         public event ConnectionEventHandler OnConnected;
         public event ConnectionEventHandler OnDisconnected;
         public event ConnectionEventHandler OnReconnecting;
-        
+
         // Message events
         public delegate void MessageEventHandler(string message);
         public event MessageEventHandler OnMessageReceived;
         public event MessageEventHandler OnError;
-        
+
         // Session information received from server
         private string _sessionId;
-        
+
         public static MCPConnection Instance
         {
             get
@@ -68,10 +70,10 @@ namespace MCP.Core
                 return _instance;
             }
         }
-        
+
         public bool IsConnected => _isConnected;
         public string SessionId => _sessionId;
-        
+
         private void Awake()
         {
             if (_instance != null && _instance != this)
@@ -79,7 +81,7 @@ namespace MCP.Core
                 Destroy(gameObject);
                 return;
             }
-            
+
             _instance = this;
             DontDestroyOnLoad(gameObject);
         }
@@ -112,7 +114,7 @@ namespace MCP.Core
         [DllImport("__Internal")]
         private static extern void WebSocketAddCloseCallback(int instanceId, Action callback);
 #endif
-        
+
         /// <summary>
         /// Connect to the MCP server.
         /// </summary>
@@ -122,21 +124,21 @@ namespace MCP.Core
         {
             if (_isConnected || _isConnecting)
                 return;
-            
+
             _isConnecting = true;
-            
+
             // Use provided parameters or defaults
             string url = serverUrl ?? _serverUrl;
             string key = apiKey ?? _apiKey;
-            
+
             // Add API key to URL if provided
             if (!string.IsNullOrEmpty(key))
             {
                 url += $"?api_key={key}";
             }
-            
+
             Debug.Log($"Connecting to MCP server: {url}");
-            
+
             try
             {
 #if UNITY_WEBGL && !UNITY_EDITOR
@@ -174,13 +176,13 @@ namespace MCP.Core
                 WebSocketConnect(_webSocketInstance);
 #else
                 _webSocket = new WebSocket(url);
-                
+
                 // Set up event handlers
                 _webSocket.OnOpen += OnWebSocketOpen;
                 _webSocket.OnClose += OnWebSocketClose;
                 _webSocket.OnMessage += OnWebSocketMessage;
                 _webSocket.OnError += OnWebSocketError;
-                
+
                 // Connect
                 _webSocket.Connect();
 #endif
@@ -190,14 +192,14 @@ namespace MCP.Core
                 _isConnecting = false;
                 Debug.LogError($"Error connecting to MCP server: {e.Message}");
                 OnError?.Invoke($"Connection error: {e.Message}");
-                
+
                 if (_autoReconnect)
                 {
                     TryReconnect();
                 }
             }
         }
-        
+
         /// <summary>
         /// Disconnect from the MCP server.
         /// </summary>
@@ -225,7 +227,7 @@ namespace MCP.Core
             if (_webSocket != null && (_isConnected || _isConnecting))
             {
                 _autoReconnect = false; // Do not reconnect after manual disconnect
-                
+
                 try
                 {
                     _webSocket.Close();
@@ -234,13 +236,13 @@ namespace MCP.Core
                 {
                     Debug.LogError($"Error disconnecting from MCP server: {e.Message}");
                 }
-                
+
                 _isConnected = false;
                 _isConnecting = false;
             }
 #endif
         }
-        
+
         /// <summary>
         /// Send a message to the MCP server.
         /// </summary>
@@ -252,7 +254,7 @@ namespace MCP.Core
                 Debug.LogWarning("Cannot send message: Not connected to MCP server");
                 return;
             }
-            
+
             try
             {
 #if UNITY_WEBGL && !UNITY_EDITOR
@@ -265,7 +267,7 @@ namespace MCP.Core
             {
                 Debug.LogError($"Error sending message to MCP server: {e.Message}");
                 OnError?.Invoke($"Send error: {e.Message}");
-                
+
                 // Connection might be lost, try to reconnect
                 if (_isConnected)
                 {
@@ -277,7 +279,7 @@ namespace MCP.Core
                 }
             }
         }
-        
+
         /// <summary>
         /// Attempt to reconnect to the server after a connection failure.
         /// </summary>
@@ -285,62 +287,62 @@ namespace MCP.Core
         {
             if (!_autoReconnect || _isConnected || _isConnecting || _reconnectAttempts >= _maxReconnectAttempts)
                 return;
-            
+
             _reconnectAttempts++;
             _isConnecting = true;
-            
+
             OnReconnecting?.Invoke();
             Debug.Log($"Attempting to reconnect to MCP server (attempt {_reconnectAttempts}/{_maxReconnectAttempts})...");
-            
+
             // Schedule reconnection after delay
             StartCoroutine(ReconnectAfterDelay());
         }
-        
+
         private IEnumerator ReconnectAfterDelay()
         {
             yield return new WaitForSeconds(_reconnectDelay);
             Connect();
         }
-        
+
 #if !UNITY_WEBGL || UNITY_EDITOR
         private void OnWebSocketOpen(object sender, EventArgs e)
         {
             _isConnected = true;
             _isConnecting = false;
             _reconnectAttempts = 0;
-            
+
             Debug.Log("Connected to MCP server");
             OnConnected?.Invoke();
         }
-        
+
         private void OnWebSocketClose(object sender, CloseEventArgs e)
         {
             _isConnected = false;
             _isConnecting = false;
-            
+
             Debug.Log($"Disconnected from MCP server: {e.Reason} (Code: {e.Code})");
             OnDisconnected?.Invoke();
-            
+
             // Try to reconnect if configured to do so
             if (_autoReconnect)
             {
                 TryReconnect();
             }
         }
-        
+
         private void OnWebSocketMessage(object sender, MessageEventArgs e)
         {
             string message = e.Data;
             ProcessReceivedMessage(message);
         }
-        
+
         private void OnWebSocketError(object sender, ErrorEventArgs e)
         {
             Debug.LogError($"WebSocket error: {e.Message}");
             OnError?.Invoke($"WebSocket error: {e.Message}");
         }
 #endif
-        
+
         /// <summary>
         /// Process messages received from the server.
         /// </summary>
@@ -350,7 +352,7 @@ namespace MCP.Core
             {
                 // Notify subscribers
                 OnMessageReceived?.Invoke(message);
-                
+
                 // Simple parsing to extract the session ID from the initial connection response
                 // For more complex messages, we'll use MCPResponseHandler class
                 if (message.Contains("\"sessionId\""))
@@ -375,7 +377,7 @@ namespace MCP.Core
                 OnError?.Invoke($"Processing error: {ex.Message}");
             }
         }
-        
+
         private void OnDestroy()
         {
             Disconnect();
