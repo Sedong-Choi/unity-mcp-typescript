@@ -1,93 +1,48 @@
 # MCP Client for Unity
 
-Model Context Protocol (MCP) Client is a Unity editor extension that connects to an MCP server to generate and modify code using AI models. This package enables developers to leverage AI assistance directly within the Unity Editor for rapid prototyping and development.
+Model Context Protocol (MCP) Client는 AI 모델을 활용하여 Unity 에디터 내에서 코드 생성 및 수정을 도와주는 확장 도구입니다.
 
-## Features
+## 간단한 설치 방법
 
-- **AI-Powered Code Generation**: Generate Unity C# scripts based on natural language prompts
-- **Code Modification**: Modify existing code with AI assistance
-- **WebSocket Communication**: Seamless connection to MCP server
-- **Conversation Management**: Maintain multiple conversation threads with the AI
-- **Template System**: Use built-in templates or create custom ones for common code patterns
-- **Code Preview**: Preview generated code before applying changes
-- **Editor-Only Integration**: All functionality contained within the Unity Editor to keep builds lean
+### 옵션 1: Unity Package Manager 사용 (권장)
 
-## Requirements
+1. Unity 프로젝트 열기
+2. Window > Package Manager 메뉴 선택
+3. 좌측 상단의 "+" 버튼 클릭
+4. "Add package from git URL..." 선택
+5. 다음 URL 입력: `https://github.com/사용자명/MCP-Client.git?path=com.mcp.client`
+6. "Add" 버튼 클릭
 
-- Unity 2020.3 or newer
-- MCP Server (included in the mcp-project repository)
-- .NET 4.x or newer
+### 옵션 2: 직접 다운로드
 
-## Installation
+1. 이 저장소를 다운로드 또는 복제합니다
+2. Unity 프로젝트의 `Packages` 폴더에 `com.mcp.client` 디렉토리를 복사합니다
 
-### Option 1: Using Unity Package Manager (Recommended)
+## 시작하기
 
-1. Open your Unity project
-2. Navigate to Window > Package Manager
-3. Click the "+" button in the top-left corner
-4. Select "Add package from disk..."
-5. Navigate to the `com.mcp.client` folder and select the `package.json` file
+1. MCP 서버 시작:
 
-### Option 2: Manual Installation
-
-1. Copy the `com.mcp.client` directory into your Unity project's `Packages` folder
-2. Unity will automatically detect and import the package
-
-### Option 3: Using manifest.json
-
-Add the following line to your `Packages/manifest.json` file:
-
-```json
-{
-  "dependencies": {
-    "com.mcp.client": "file:../path/to/com.mcp.client"
-  }
-}
+```bash
+cd mcp-server
+npm install
+npm run start:dev
 ```
 
-## Quick Start
+2. Unity에서 MCP 클라이언트 열기:
+   Window > AI > Improved MCP Client
 
-1. Start the MCP server:
-   ```
-   cd mcp-server
-   npm install
-   npm run start:dev
-   ```
+3. 서버에 자동으로 연결됩니다. (기본 주소: ws://localhost:8765)
 
-2. Open the MCP client in Unity:
-   Navigate to Window > AI > Improved MCP Client
+## 주요 기능
 
-3. Connect to the server:
-   The client will automatically connect to the local server (ws://localhost:8765) by default. If your server is running elsewhere, update the Server URL in the settings tab.
+- 자연어로 Unity C# 스크립트 생성
+- 기존 코드 수정 및 개선
+- 다양한 코드 템플릿 제공
+- 생성된 코드 미리보기 및 적용
 
-4. Start a new conversation:
-   Click "New Conversation" and begin by describing what you'd like to create.
+## 필수 요구사항
 
-## Documentation
+- Unity 2020.3 이상
+- npm이 설치된 Node.js 환경 (MCP 서버용)
 
-For detailed documentation, please refer to the [Documentation](Documentation~/index.md) folder within this package.
-
-## Project Structure
-
-```
-com.mcp.client/
-├── Editor/          # Editor-only code (not included in builds)
-│   ├── UI/          # Editor UI components
-│   └── Utils/       # Editor utilities
-├── Runtime/         # Runtime code (can be included in builds if needed)
-│   ├── Core/        # Core functionality
-│   ├── Models/      # Data models
-│   └── Utils/       # Utility classes
-└── Documentation~/  # Detailed documentation
-```
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
-
-## Acknowledgements
-
-The MCP Client utilizes the following third-party libraries:
-
-- WebSocketSharp: For WebSocket communication in the Unity Editor
-- Newtonsoft.Json: For JSON serialization and deserialization
+모든 필요한 의존성이 패키지에 포함되어 있어 별도 설치가 필요 없습니다.

@@ -245,7 +245,7 @@ namespace MCP.Core
         /// Send a message to the MCP server.
         /// </summary>
         /// <param name="message">JSON message string</param>
-        public void SendMessage(string message)
+        public new void SendMessage(string message)
         {
             if (!_isConnected)
             {

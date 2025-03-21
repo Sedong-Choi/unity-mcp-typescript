@@ -1,9 +1,7 @@
 {
   "name": "MCP.Client",
   "rootNamespace": "MCP",
-  "references": [
-    "Unity.Newtonsoft.Json"
-  ],
+  "references": [],
   "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,
