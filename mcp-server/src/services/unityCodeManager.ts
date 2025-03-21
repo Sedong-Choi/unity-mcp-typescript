@@ -8,7 +8,7 @@ class FileManager implements UnityCodeManager {
   
   constructor(unityProjectPath: string) {
     // 경로에서 이스케이프 문자 제거
-    this.unityProjectPath = unityProjectPath.replace(/\\/g, '');;
+    this.unityProjectPath = path.normalize(unityProjectPath);
     logger.info(`Unity 프로젝트 경로 설정: ${this.unityProjectPath}`);
     
     // 경로 유효성 검사
