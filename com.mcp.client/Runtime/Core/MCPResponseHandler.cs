@@ -41,7 +41,7 @@ namespace MCP.Core
             {
                 if (_instance == null)
                 {
-                    MCPResponseHandler existingHandler = FindObjectOfType<MCPResponseHandler>();
+                    MCPResponseHandler existingHandler = UnityEngine.Object.FindObjectOfType<MCPResponseHandler>();
                     
                     if (existingHandler != null)
                     {
@@ -75,14 +75,16 @@ namespace MCP.Core
         
         private void Awake()
         {
-            if (_instance != null && _instance != this)
+            // Initialize 메서드를 통해 중복 확인 및 초기화를 하므로 여기서는 간단히 처리
+            if (_instance == null)
+            {
+                _instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+            else if (_instance != this)
             {
                 Destroy(gameObject);
-                return;
             }
-            
-            _instance = this;
-            DontDestroyOnLoad(gameObject);
         }
         
         private void Start()

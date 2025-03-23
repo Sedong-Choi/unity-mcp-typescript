@@ -24,9 +24,9 @@ namespace MCP.Editor.Utils
             _initialized = true;
             
             // 이미 씬에 존재하는 컴포넌트 확인
-            MCPConnection existingConnection = Object.FindObjectOfType<MCPConnection>();
-            MCPRequestManager existingRequestManager = Object.FindObjectOfType<MCPRequestManager>();
-            MCPResponseHandler existingResponseHandler = Object.FindObjectOfType<MCPResponseHandler>();
+            MCPConnection existingConnection = UnityEngine.Object.FindObjectOfType<MCPConnection>();
+            MCPRequestManager existingRequestManager = UnityEngine.Object.FindObjectOfType<MCPRequestManager>();
+            MCPResponseHandler existingResponseHandler = UnityEngine.Object.FindObjectOfType<MCPResponseHandler>();
             
             GameObject mcpManager = null;
             
@@ -71,9 +71,27 @@ namespace MCP.Editor.Utils
             // 각 인스턴스 초기화 (싱글톤 패턴 강제)
             if (mcpManager != null)
             {
-                MCPConnection.Instance.Initialize();
-                MCPRequestManager.Instance.Initialize();
-                MCPResponseHandler.Instance.Initialize();
+                // 먼저 모든 필요한 컴포넌트가 있는지 확인합니다
+                if (mcpManager.GetComponent<MCPConnection>() == null)
+                    mcpManager.AddComponent<MCPConnection>();
+                    
+                if (mcpManager.GetComponent<MCPRequestManager>() == null)
+                    mcpManager.AddComponent<MCPRequestManager>();
+                    
+                if (mcpManager.GetComponent<MCPResponseHandler>() == null)
+                    mcpManager.AddComponent<MCPResponseHandler>();
+                
+                // 각 컴포넌트의 초기화 메서드 호출
+                if (MCPConnection.Instance != null)
+                    MCPConnection.Instance.Initialize();
+                    
+                if (MCPRequestManager.Instance != null)
+                    MCPRequestManager.Instance.Initialize();
+                    
+                if (MCPResponseHandler.Instance != null)
+                    MCPResponseHandler.Instance.Initialize();
+                    
+                Debug.Log("MCP 서비스가 초기화되었습니다.");
             }
         }
     }
