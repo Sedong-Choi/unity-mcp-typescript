@@ -47,6 +47,11 @@ namespace MCP.UI
         private const string PREF_AUTO_CONNECT = "MCP_AUTO_CONNECT";
         private const string PREF_OUTPUT_PATH = "MCP_OUTPUT_PATH";
         
+        // 에디터 명령 실행 결과 목록
+        private List<string> _editorCommandResults = new List<string>();
+        private Vector2 _commandResultsScrollPos;
+        private bool _showEditorCommands = true;
+        
         [MenuItem("Window/AI/MCP Client")]
         public static void ShowWindow()
         {
@@ -82,6 +87,7 @@ namespace MCP.UI
                 _responseHandler.OnCodeModifications += HandleCodeModifications;
                 _responseHandler.OnError += HandleError;
                 _responseHandler.OnConnectionStatusChanged += HandleConnectionStatusChanged;
+                _responseHandler.OnEditorCommandExecuted += HandleEditorCommandExecuted;
                 
                 // 현재 연결 상태 확인
                 _isConnected = _connection.IsConnected;
@@ -120,6 +126,7 @@ namespace MCP.UI
                 _responseHandler.OnCodeModifications -= HandleCodeModifications;
                 _responseHandler.OnError -= HandleError;
                 _responseHandler.OnConnectionStatusChanged -= HandleConnectionStatusChanged;
+                _responseHandler.OnEditorCommandExecuted -= HandleEditorCommandExecuted;
             }
         }
         
@@ -206,6 +213,27 @@ namespace MCP.UI
             }
             
             EditorGUILayout.EndScrollView();
+            
+            // 에디터 명령 결과 표시 영역
+            _showEditorCommands = EditorGUILayout.Foldout(_showEditorCommands, "에디터 명령 결과", true);
+            
+            if (_showEditorCommands)
+            {
+                _commandResultsScrollPos = EditorGUILayout.BeginScrollView(_commandResultsScrollPos, GUILayout.Height(150));
+                
+                foreach (string result in _editorCommandResults)
+                {
+                    EditorGUILayout.HelpBox(result, MessageType.Info);
+                }
+                
+                EditorGUILayout.EndScrollView();
+                
+                if (GUILayout.Button("명령 결과 지우기"))
+                {
+                    _editorCommandResults.Clear();
+                }
+            }
+            
             EditorGUILayout.EndVertical();
             
             // 오른쪽 패널 - 메시지 기록 및 입력
@@ -518,6 +546,24 @@ namespace MCP.UI
                 }
             }
             
+            Repaint();
+        }
+        
+        /// <summary>
+        /// 에디터 명령 실행 결과를 처리합니다.
+        /// </summary>
+        private void HandleEditorCommandExecuted(string message)
+        {
+            // 명령 결과 목록에 추가
+            _editorCommandResults.Add($"[{DateTime.Now.ToString("HH:mm:ss")}] {message}");
+            
+            // 최대 50개까지만 유지
+            if (_editorCommandResults.Count > 50)
+            {
+                _editorCommandResults.RemoveAt(0);
+            }
+            
+            // UI 갱신
             Repaint();
         }
         

@@ -35,6 +35,9 @@ namespace MCP.Core
         // For tracking message history by conversation
         private Dictionary<string, List<MCPMessage>> _messageHistory = new Dictionary<string, List<MCPMessage>>();
         
+        // 유니티 에디터 명령 처리 결과 이벤트
+        public event Action<string> OnEditorCommandExecuted;
+        
         public static MCPResponseHandler Instance
         {
             get
@@ -108,14 +111,22 @@ namespace MCP.Core
         
         private void Start()
         {
-            // Get reference to the connection manager
             _connection = MCPConnection.Instance;
             
-            // Subscribe to message events
+            // 이벤트 구독
             _connection.OnMessageReceived += HandleMessage;
             _connection.OnError += HandleConnectionError;
             _connection.OnConnected += () => OnConnectionStatusChanged?.Invoke(true, _connection.SessionId);
             _connection.OnDisconnected += () => OnConnectionStatusChanged?.Invoke(false, null);
+
+#if UNITY_EDITOR
+            // 에디터 명령 실행 결과 이벤트 구독
+            if (Application.isEditor)
+            {
+                MCP.Editor.Utils.MCPEditorController.OnEditorActionCompleted += HandleEditorActionCompleted;
+                MCP.Editor.Utils.MCPCommandInterpreter.OnCommandInterpreted += HandleCommandInterpreted;
+            }
+#endif
         }
         
         /// <summary>
@@ -406,6 +417,76 @@ namespace MCP.Core
                 _connection.OnMessageReceived -= HandleMessage;
                 _connection.OnError -= HandleConnectionError;
             }
+
+#if UNITY_EDITOR
+            // 에디터 명령 실행 결과 이벤트 구독 해제
+            if (Application.isEditor)
+            {
+                MCP.Editor.Utils.MCPEditorController.OnEditorActionCompleted -= HandleEditorActionCompleted;
+                MCP.Editor.Utils.MCPCommandInterpreter.OnCommandInterpreted -= HandleCommandInterpreted;
+            }
+#endif
         }
+
+        /// <summary>
+        /// AI의 응답 메시지를 처리합니다.
+        /// </summary>
+        private void ProcessAssistantResponse(string conversationId, MCPMessage message)
+        {
+            // 메시지를 대화 기록에 추가
+            AddMessageToHistory(conversationId, message);
+            
+            // 텍스트 응답 이벤트 발생
+            OnTextResponse?.Invoke(conversationId, message.Content, message.IsComplete);
+
+#if UNITY_EDITOR
+            // 에디터 전용: 메시지에서 유니티 명령 실행
+            if (Application.isEditor)
+            {
+                ProcessEditorCommands(message);
+            }
+#endif
+        }
+
+#if UNITY_EDITOR
+        /// <summary>
+        /// AI 응답 메시지에서 Unity 에디터 명령을 처리합니다.
+        /// </summary>
+        private void ProcessEditorCommands(MCPMessage message)
+        {
+            if (message == null || message.MessageRole != MCPMessage.Role.Assistant)
+                return;
+            
+            try
+            {
+                bool commandExecuted = MCP.Editor.Utils.MCPCommandInterpreter.ProcessMessage(message);
+                
+                if (commandExecuted)
+                {
+                    Debug.Log("AI 응답에서 Unity 에디터 명령이 실행되었습니다.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Unity 에디터 명령 처리 중 오류 발생: {ex.Message}");
+            }
+        }
+        
+        /// <summary>
+        /// 에디터 명령 실행 결과를 처리합니다.
+        /// </summary>
+        private void HandleEditorActionCompleted(string message)
+        {
+            OnEditorCommandExecuted?.Invoke(message);
+        }
+        
+        /// <summary>
+        /// 명령 해석 결과를 처리합니다.
+        /// </summary>
+        private void HandleCommandInterpreted(string message)
+        {
+            // 필요한 경우 추가 처리
+        }
+#endif
     }
 }
