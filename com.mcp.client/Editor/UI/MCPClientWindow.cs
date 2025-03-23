@@ -170,9 +170,12 @@ namespace MCP.UI
             
             if (GUILayout.Button("새 대화"))
             {
-                _activeConversationId = _requestManager.CreateConversation();
-                RefreshConversationList();
-                _messages.Clear();
+                if (_requestManager != null)
+                {
+                    _activeConversationId = _requestManager.CreateConversation();
+                    RefreshConversationList();
+                    _messages.Clear();
+                }
             }
             
             _conversationListScrollPos = EditorGUILayout.BeginScrollView(_conversationListScrollPos, GUILayout.ExpandHeight(true));
@@ -180,7 +183,7 @@ namespace MCP.UI
             foreach (string convId in _conversations)
             {
                 bool isActive = convId == _activeConversationId;
-                string description = _requestManager.GetConversationDescription(convId) ?? "제목 없음";
+                string description = _requestManager != null ? _requestManager.GetConversationDescription(convId) ?? "제목 없음" : "제목 없음";
                 
                 // 긴 설명 줄이기
                 if (description.Length > 25)
@@ -386,8 +389,11 @@ namespace MCP.UI
         
         private void SendChatMessage()
         {
-            if (!_isConnected || string.IsNullOrEmpty(_currentPrompt))
+            if (!_isConnected || string.IsNullOrEmpty(_currentPrompt) || _requestManager == null || _responseHandler == null)
+            {
+                Debug.LogWarning("채팅 메시지를 보낼 수 없습니다. 서비스가 초기화되지 않았거나 연결되지 않았습니다.");
                 return;
+            }
             
             // 새 대화 시작 또는 기존 대화 계속
             if (string.IsNullOrEmpty(_activeConversationId))
@@ -410,8 +416,11 @@ namespace MCP.UI
         
         private void SendGenerateRequest()
         {
-            if (!_isConnected || string.IsNullOrEmpty(_currentPrompt))
+            if (!_isConnected || string.IsNullOrEmpty(_currentPrompt) || _requestManager == null || _responseHandler == null)
+            {
+                Debug.LogWarning("코드 생성 요청을 보낼 수 없습니다. 서비스가 초기화되지 않았거나 연결되지 않았습니다.");
                 return;
+            }
             
             // 새 대화 시작 또는 기존 대화 계속
             if (string.IsNullOrEmpty(_activeConversationId))
@@ -439,7 +448,7 @@ namespace MCP.UI
         
         private void RefreshMessageHistory()
         {
-            if (!string.IsNullOrEmpty(_activeConversationId))
+            if (_responseHandler != null && !string.IsNullOrEmpty(_activeConversationId))
             {
                 _messages = _responseHandler.GetMessageHistory(_activeConversationId);
                 
