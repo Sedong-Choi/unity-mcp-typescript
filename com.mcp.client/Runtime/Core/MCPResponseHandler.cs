@@ -44,7 +44,7 @@ namespace MCP.Core
             {
                 if (_instance == null)
                 {
-                    MCPResponseHandler existingHandler = UnityEngine.Object.FindObjectOfType<MCPResponseHandler>();
+                    MCPResponseHandler existingHandler = UnityEngine.Object.FindAnyObjectByType<MCPResponseHandler>();
                     
                     if (existingHandler != null)
                     {

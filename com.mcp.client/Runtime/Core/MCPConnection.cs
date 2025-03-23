@@ -63,7 +63,7 @@ namespace MCP.Core
             {
                 if (_instance == null)
                 {
-                    MCPConnection existingConnection = UnityEngine.Object.FindObjectOfType<MCPConnection>();
+                    MCPConnection existingConnection = UnityEngine.Object.FindAnyObjectByType<MCPConnection>();
                     
                     if (existingConnection != null)
                     {

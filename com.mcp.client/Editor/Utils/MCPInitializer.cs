@@ -51,9 +51,9 @@ namespace MCP.Editor.Utils
                 return _mcpManager;
                 
             // 이미 씬에 존재하는 컴포넌트 확인
-            MCPConnection existingConnection = UnityEngine.Object.FindObjectOfType<MCPConnection>();
-            MCPRequestManager existingRequestManager = UnityEngine.Object.FindObjectOfType<MCPRequestManager>();
-            MCPResponseHandler existingResponseHandler = UnityEngine.Object.FindObjectOfType<MCPResponseHandler>();
+            MCPConnection existingConnection = UnityEngine.Object.FindAnyObjectByType<MCPConnection>();
+            MCPRequestManager existingRequestManager = UnityEngine.Object.FindAnyObjectByType<MCPRequestManager>();
+            MCPResponseHandler existingResponseHandler = UnityEngine.Object.FindAnyObjectByType<MCPResponseHandler>();
             
             // 이미 생성된 컴포넌트가 있는지 확인
             if (existingConnection != null)

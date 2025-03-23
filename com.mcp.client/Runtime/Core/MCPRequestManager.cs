@@ -34,7 +34,7 @@ namespace MCP.Core
             {
                 if (_instance == null)
                 {
-                    MCPRequestManager existingManager = UnityEngine.Object.FindObjectOfType<MCPRequestManager>();
+                    MCPRequestManager existingManager = UnityEngine.Object.FindAnyObjectByType<MCPRequestManager>();
                     
                     if (existingManager != null)
                     {
