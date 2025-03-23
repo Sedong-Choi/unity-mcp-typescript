@@ -49,6 +49,14 @@ namespace MCP.Core
             }
         }
         
+        public void Initialize()
+        {
+            if (_instance == null)
+            {
+                _instance = this;
+            }
+        }
+        
         private void Awake()
         {
             if (_instance != null && _instance != this)

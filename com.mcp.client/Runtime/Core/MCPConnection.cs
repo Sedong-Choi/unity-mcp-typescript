@@ -63,11 +63,19 @@ namespace MCP.Core
             {
                 if (_instance == null)
                 {
-                    GameObject go = new GameObject("MCPConnection");
+                    GameObject go = new GameObject("MCP Connection");
                     _instance = go.AddComponent<MCPConnection>();
                     DontDestroyOnLoad(go);
                 }
                 return _instance;
+            }
+        }
+
+        public void Initialize()
+        {
+            if (_instance == null)
+            {
+                _instance = this;
             }
         }
 

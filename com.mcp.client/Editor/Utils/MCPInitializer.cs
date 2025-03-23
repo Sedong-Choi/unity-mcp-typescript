@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 using MCP.Core;
+using MCP.Utils;
 
 namespace MCP.Editor.Utils
 {
@@ -20,7 +21,7 @@ namespace MCP.Editor.Utils
             if (existingConnection == null)
             {
                 // 자동 생성 여부 확인 (선택사항)
-                bool autoCreate = EditorPrefs.GetBool("MCP_AutoCreateManager", false);
+                bool autoCreate = EditorPrefs.GetBool("MCP_AutoCreateManager", true);
                 
                 if (autoCreate)
                 {
@@ -30,8 +31,20 @@ namespace MCP.Editor.Utils
                     mcpManager.AddComponent<MCPRequestManager>();
                     mcpManager.AddComponent<MCPResponseHandler>();
                     
+                    // 싱글톤 인스턴스 초기화
+                    MCPConnection.Instance.Initialize();
+                    MCPRequestManager.Instance.Initialize();
+                    MCPResponseHandler.Instance.Initialize();
+                    
                     Debug.Log("MCP 관리자가 자동으로 씬에 추가되었습니다.");
                 }
+            }
+            else
+            {
+                // 기존 인스턴스가 있는 경우에도 초기화
+                MCPConnection.Instance.Initialize();
+                MCPRequestManager.Instance.Initialize();
+                MCPResponseHandler.Instance.Initialize();
             }
         }
     }
