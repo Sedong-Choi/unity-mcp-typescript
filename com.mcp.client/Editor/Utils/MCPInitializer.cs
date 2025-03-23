@@ -8,6 +8,8 @@ namespace MCP.Editor.Utils
     [InitializeOnLoad]
     public class MCPInitializer
     {
+        private static bool _initialized = false;
+        
         static MCPInitializer()
         {
             EditorApplication.delayCall += Initialize;
@@ -15,33 +17,60 @@ namespace MCP.Editor.Utils
 
         private static void Initialize()
         {
-            // 이미 씬에 MCPConnection이 있는지 확인
-            MCPConnection existingConnection = Object.FindObjectOfType<MCPConnection>();
+            // 이미 초기화되었는지 확인
+            if (_initialized)
+                return;
+                
+            _initialized = true;
             
-            if (existingConnection == null)
+            // 이미 씬에 존재하는 컴포넌트 확인
+            MCPConnection existingConnection = Object.FindObjectOfType<MCPConnection>();
+            MCPRequestManager existingRequestManager = Object.FindObjectOfType<MCPRequestManager>();
+            MCPResponseHandler existingResponseHandler = Object.FindObjectOfType<MCPResponseHandler>();
+            
+            GameObject mcpManager = null;
+            
+            // 이미 생성된 컴포넌트가 있는지 확인
+            if (existingConnection != null)
             {
-                // 자동 생성 여부 확인 (선택사항)
+                mcpManager = existingConnection.gameObject;
+                Debug.Log("기존 MCP Connection을 찾았습니다.");
+            }
+            else if (existingRequestManager != null)
+            {
+                mcpManager = existingRequestManager.gameObject;
+                Debug.Log("기존 MCP Request Manager를 찾았습니다.");
+            }
+            else if (existingResponseHandler != null)
+            {
+                mcpManager = existingResponseHandler.gameObject;
+                Debug.Log("기존 MCP Response Handler를 찾았습니다.");
+            }
+            
+            // 기존 객체가 없는 경우 새로 생성
+            if (mcpManager == null)
+            {
                 bool autoCreate = EditorPrefs.GetBool("MCP_AutoCreateManager", true);
                 
                 if (autoCreate)
                 {
-                    // MCP 관리자 게임오브젝트 생성
-                    GameObject mcpManager = new GameObject("MCP Manager");
-                    mcpManager.AddComponent<MCPConnection>();
-                    mcpManager.AddComponent<MCPRequestManager>();
-                    mcpManager.AddComponent<MCPResponseHandler>();
+                    mcpManager = new GameObject("MCP Manager");
                     
-                    // 싱글톤 인스턴스 초기화
-                    MCPConnection.Instance.Initialize();
-                    MCPRequestManager.Instance.Initialize();
-                    MCPResponseHandler.Instance.Initialize();
+                    // 필요한 컴포넌트 추가
+                    if (existingConnection == null) mcpManager.AddComponent<MCPConnection>();
+                    if (existingRequestManager == null) mcpManager.AddComponent<MCPRequestManager>();
+                    if (existingResponseHandler == null) mcpManager.AddComponent<MCPResponseHandler>();
                     
-                    Debug.Log("MCP 관리자가 자동으로 씬에 추가되었습니다.");
+                    // 씬 전환 시에도 보존
+                    Object.DontDestroyOnLoad(mcpManager);
+                    
+                    Debug.Log("MCP 관리자가 생성되었습니다.");
                 }
             }
-            else
+            
+            // 각 인스턴스 초기화 (싱글톤 패턴 강제)
+            if (mcpManager != null)
             {
-                // 기존 인스턴스가 있는 경우에도 초기화
                 MCPConnection.Instance.Initialize();
                 MCPRequestManager.Instance.Initialize();
                 MCPResponseHandler.Instance.Initialize();

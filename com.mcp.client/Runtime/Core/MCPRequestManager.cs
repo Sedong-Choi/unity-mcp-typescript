@@ -34,9 +34,18 @@ namespace MCP.Core
             {
                 if (_instance == null)
                 {
-                    GameObject go = new GameObject("MCPRequestManager");
-                    _instance = go.AddComponent<MCPRequestManager>();
-                    DontDestroyOnLoad(go);
+                    MCPRequestManager existingManager = FindObjectOfType<MCPRequestManager>();
+                    
+                    if (existingManager != null)
+                    {
+                        _instance = existingManager;
+                    }
+                    else
+                    {
+                        GameObject go = new GameObject("MCPRequestManager");
+                        _instance = go.AddComponent<MCPRequestManager>();
+                        DontDestroyOnLoad(go);
+                    }
                 }
                 return _instance;
             }
@@ -47,6 +56,13 @@ namespace MCP.Core
             if (_instance == null)
             {
                 _instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+            else if (_instance != this)
+            {
+                // 이미 다른 인스턴스가 있는 경우 이 객체를 제거
+                Debug.LogWarning("중복된 MCPRequestManager 인스턴스가 감지되어 제거됩니다.");
+                Destroy(gameObject);
             }
         }
         

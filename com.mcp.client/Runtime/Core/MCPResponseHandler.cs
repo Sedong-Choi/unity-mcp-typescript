@@ -41,9 +41,18 @@ namespace MCP.Core
             {
                 if (_instance == null)
                 {
-                    GameObject go = new GameObject("MCPResponseHandler");
-                    _instance = go.AddComponent<MCPResponseHandler>();
-                    DontDestroyOnLoad(go);
+                    MCPResponseHandler existingHandler = FindObjectOfType<MCPResponseHandler>();
+                    
+                    if (existingHandler != null)
+                    {
+                        _instance = existingHandler;
+                    }
+                    else
+                    {
+                        GameObject go = new GameObject("MCPResponseHandler");
+                        _instance = go.AddComponent<MCPResponseHandler>();
+                        DontDestroyOnLoad(go);
+                    }
                 }
                 return _instance;
             }
@@ -54,6 +63,13 @@ namespace MCP.Core
             if (_instance == null)
             {
                 _instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+            else if (_instance != this)
+            {
+                // 이미 다른 인스턴스가 있는 경우 이 객체를 제거
+                Debug.LogWarning("중복된 MCPResponseHandler 인스턴스가 감지되어 제거됩니다.");
+                Destroy(gameObject);
             }
         }
         
