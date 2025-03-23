@@ -5,6 +5,7 @@ using UnityEditor;
 using MCP.Core;
 using MCP.Models;
 using MCP.Utils;
+using MCP.Editor.Utils;
 
 namespace MCP.UI
 {
@@ -62,11 +63,45 @@ namespace MCP.UI
             _autoConnect = EditorPrefs.GetBool(PREF_AUTO_CONNECT, true);
             _outputPath = EditorPrefs.GetString(PREF_OUTPUT_PATH, "Assets/Scripts/Generated");
             
-            InitializeServices();
+            // MCPInitializer를 사용하여 MCP 서비스 초기화
+            GameObject mcpManager = MCPInitializer.InitializeMCPManager();
             
-            if (_autoConnect)
+            if (mcpManager != null)
             {
-                Connect();
+                // 서비스 참조 가져오기
+                _connection = MCPConnection.Instance;
+                _requestManager = MCPRequestManager.Instance;
+                _responseHandler = MCPResponseHandler.Instance;
+                _codeFileManager = CodeFileManager.Instance;
+                
+                // 파일 관리자 구성
+                _codeFileManager.Configure(_outputPath);
+                
+                // 이벤트 구독
+                _responseHandler.OnTextResponse += HandleTextResponse;
+                _responseHandler.OnCodeModifications += HandleCodeModifications;
+                _responseHandler.OnError += HandleError;
+                _responseHandler.OnConnectionStatusChanged += HandleConnectionStatusChanged;
+                
+                // 현재 연결 상태 확인
+                _isConnected = _connection.IsConnected;
+                _connectionStatusText = _isConnected ? "연결됨" : "연결 안됨";
+                
+                // 이미 연결되어 있으면 대화 목록 새로고침
+                if (_isConnected)
+                {
+                    RefreshConversationList();
+                }
+                
+                // 자동 연결 설정이 활성화되어 있으면 연결 시도
+                if (_autoConnect && !_isConnected)
+                {
+                    Connect();
+                }
+            }
+            else
+            {
+                Debug.LogError("MCP 서비스를 초기화할 수 없습니다.");
             }
         }
         
@@ -86,24 +121,6 @@ namespace MCP.UI
                 _responseHandler.OnError -= HandleError;
                 _responseHandler.OnConnectionStatusChanged -= HandleConnectionStatusChanged;
             }
-        }
-        
-        private void InitializeServices()
-        {
-            // 서비스 참조 가져오기
-            _connection = MCPConnection.Instance;
-            _requestManager = MCPRequestManager.Instance;
-            _responseHandler = MCPResponseHandler.Instance;
-            _codeFileManager = CodeFileManager.Instance;
-            
-            // 파일 관리자 구성
-            _codeFileManager.Configure(_outputPath);
-            
-            // 이벤트 구독
-            _responseHandler.OnTextResponse += HandleTextResponse;
-            _responseHandler.OnCodeModifications += HandleCodeModifications;
-            _responseHandler.OnError += HandleError;
-            _responseHandler.OnConnectionStatusChanged += HandleConnectionStatusChanged;
         }
         
         private void OnGUI()

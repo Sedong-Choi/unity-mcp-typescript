@@ -49,15 +49,21 @@ namespace MCP.Core
                     }
                     else
                     {
+                        // 이 부분은 MCPInitializer에서 관리하도록 변경
                         GameObject go = new GameObject("MCPResponseHandler");
                         _instance = go.AddComponent<MCPResponseHandler>();
                         DontDestroyOnLoad(go);
+                        Debug.LogWarning("MCPResponseHandler가 자동 생성되었습니다. MCPInitializer.InitializeMCPManager()를 사용하는 것이 좋습니다.");
                     }
                 }
                 return _instance;
             }
         }
         
+        
+        /// <summary>
+        /// MCPResponseHandler 인스턴스를 초기화합니다.
+        /// </summary>
         public void Initialize()
         {
             if (_instance == null)
@@ -70,6 +76,19 @@ namespace MCP.Core
                 // 이미 다른 인스턴스가 있는 경우 이 객체를 제거
                 Debug.LogWarning("중복된 MCPResponseHandler 인스턴스가 감지되어 제거됩니다.");
                 Destroy(gameObject);
+                return;
+            }
+            
+            // Start 메서드의 로직을 여기로 이동
+            if (_connection == null)
+            {
+                _connection = MCPConnection.Instance;
+                
+                // 이벤트 구독
+                _connection.OnMessageReceived += HandleMessage;
+                _connection.OnError += HandleConnectionError;
+                _connection.OnConnected += () => OnConnectionStatusChanged?.Invoke(true, _connection.SessionId);
+                _connection.OnDisconnected += () => OnConnectionStatusChanged?.Invoke(false, null);
             }
         }
         

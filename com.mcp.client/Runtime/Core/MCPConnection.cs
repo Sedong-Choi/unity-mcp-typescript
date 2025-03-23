@@ -71,15 +71,22 @@ namespace MCP.Core
                     }
                     else
                     {
+                        // 이 부분은 MCPInitializer에서 관리하도록 변경
+                        // GameObject가 없는 경우 MCPInitializer의 InitializeMCPManager()를 호출하도록 권장
                         GameObject go = new GameObject("MCP Connection");
                         _instance = go.AddComponent<MCPConnection>();
                         DontDestroyOnLoad(go);
+                        Debug.LogWarning("MCPConnection이 자동 생성되었습니다. MCPInitializer.InitializeMCPManager()를 사용하는 것이 좋습니다.");
                     }
                 }
                 return _instance;
             }
         }
 
+        /// <summary>
+        /// MCPConnection 인스턴스를 초기화합니다.
+        /// 모든 관련 객체가 올바르게 참조되도록 합니다.
+        /// </summary>
         public void Initialize()
         {
             if (_instance == null)
@@ -92,6 +99,14 @@ namespace MCP.Core
                 // 이미 다른 인스턴스가 있는 경우 이 객체를 제거
                 Debug.LogWarning("중복된 MCPConnection 인스턴스가 감지되어 제거됩니다.");
                 Destroy(gameObject);
+                return;
+            }
+            
+            // 연결 상태 확인
+            if (_isConnected)
+            {
+                Debug.Log("MCPConnection이 이미 연결되어 있습니다.");
+                OnConnected?.Invoke();
             }
         }
 
